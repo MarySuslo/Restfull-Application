@@ -14,36 +14,40 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 public class SongsRepositoryImpl implements SimpleRepository<Songs> {
 
     private ConnectionManager connectionManager;
 
+    String insertSQL = "INSERT INTO songs (id_song, name_song, singer) VALUES (?, ?, ?) ";
+    String findIdSQL = "SELECT * FROM songs WHERE id_song=?";
+    String deleteByIdSQL = "DELETE FROM songs WHERE id_song=?";
+    String findAllSQL = "SELECT * FROM songs ORDER BY id_song;";
+    String updateSongSQL = "UPDATE songs SET name_song=?, singer=? WHERE id_song=?";
+
     @Override
-    public Songs findById(int song_id) {
+    public Songs findById(int songId) {
         connectionManager = new ConnectionManagerImpl();
 
         Songs song = null;
         try (Connection connection = connectionManager.getConnection()) {
 
-            PreparedStatement prStatement = connection.prepareStatement("select * from songs " +
-                    "where id_song=" + song_id + " order by id_song");
-            ResultSet result = prStatement.executeQuery();
-            while (result.next()) {
-                int id = result.getInt("id_song");
-                String nameSong = result.getString("name_song");
-
-                Singers singer = new SingersRepositoryImpl().findById(result.getInt("singer"));
-                song = new Songs(id, nameSong, singer);
+            try (PreparedStatement prStatement = connection.prepareStatement(findIdSQL)) {
+                prStatement.setInt(1, songId);
+                ResultSet result = prStatement.executeQuery();
+                if (result.next()) {
+                    song = map(result);
+                }
+            }
+            if (song != null) {
+                return song;
+            } else {
+                throw new SQLException("Песня не найдена");
             }
         } catch (SQLException e) {
-            e.getMessage();
-        }
-        if (song == null)
             throw new NotFoundException("Песни с таким индексон не найдено");
+        }
 
-        return song;
     }
 
     @Override
@@ -51,14 +55,14 @@ public class SongsRepositoryImpl implements SimpleRepository<Songs> {
 
         connectionManager = new ConnectionManagerImpl();
         try (Connection connection = connectionManager.getConnection()) {
-            PreparedStatement prStatement = connection.prepareStatement("delete from songs where id_song=" + id + ";");
-
-            int result = prStatement.executeUpdate();
-
-            if (result == 0)
-                throw new SQLException("Ошибка удаления");
-
-            return true;
+            try (PreparedStatement prStatement = connection.prepareStatement(deleteByIdSQL)) {
+                prStatement.setInt(1, id);
+                if (prStatement.executeUpdate() > 0) {
+                    return true;
+                } else {
+                    throw new SQLException("Ошибка удаления");
+                }
+            }
         } catch (SQLException e) {
             throw new DataBaseException("Ошибка удаления");
         }
@@ -68,20 +72,16 @@ public class SongsRepositoryImpl implements SimpleRepository<Songs> {
     public List<Songs> findAll() {
         connectionManager = new ConnectionManagerImpl();
 
-        List<Songs> songsList = new ArrayList<Songs>();
+        List<Songs> songsList = new ArrayList<>();
 
         try (Connection connection = connectionManager.getConnection()) {
 
-            PreparedStatement prStatement = connection.prepareStatement("select * from songs order by id_song");
-            ResultSet result = prStatement.executeQuery();
+            try (PreparedStatement prStatement = connection.prepareStatement(findAllSQL)) {
+                ResultSet result = prStatement.executeQuery();
 
-            while (result.next()) {
-                int id = result.getInt("id_song");
-                String nameSong = result.getString("name_song");
-
-                Singers singer = new SingersRepositoryImpl().findById(result.getInt("singer"));
-
-                songsList.add(new Songs(id, nameSong, singer));
+                while (result.next()) {
+                    songsList.add(map(result));
+                }
             }
         } catch (SQLException e) {
             e.getMessage();
@@ -94,36 +94,47 @@ public class SongsRepositoryImpl implements SimpleRepository<Songs> {
     public boolean save(Songs song) {
         connectionManager = new ConnectionManagerImpl();
         try (Connection connection = connectionManager.getConnection()) {
-            PreparedStatement prStatement = connection.prepareStatement("insert into songs values (" +
-                    song.getIdSong() + ", '" + song.getNameSong() + "'," + song.getSinger().getIdSinger() + ") ;");
-            prStatement.executeUpdate();
-            song.getSinger().getSongs().add(song);
-            return true;
+            try (PreparedStatement prStatement = connection.prepareStatement(insertSQL)) {
+                prStatement.setInt(1, song.getIdSong());
+                prStatement.setString(2, song.getNameSong());
+                prStatement.setInt(3, song.getSinger().getIdSinger());
+                prStatement.executeUpdate();
+                //  song.getSinger().getSongs().add(song);
+
+                return song.getIdSong() > 0;
+            }
         } catch (SQLException e) {
             throw new DuplicateDataException("Песня с таким индексом уже существует");
         }
     }
 
     @Override
-    public List<Songs> update(Songs song) {
+    public boolean update(Songs song) {
         connectionManager = new ConnectionManagerImpl();
         try (Connection connection = connectionManager.getConnection()) {
-            PreparedStatement prStatement = connection.prepareStatement("update songs set " +
-                    " name_song= '" + song.getNameSong() + "'" +
-                    ", singer=" + song.getSinger().getIdSinger() +
-                    " where id_song=" + song.getIdSong() + ";");
+            try (PreparedStatement prStatement = connection.prepareStatement(updateSongSQL)) {
+                prStatement.setString(1, song.getNameSong());
+                prStatement.setInt(2, song.getSinger().getIdSinger());
+                prStatement.setInt(3, song.getIdSong());
 
-            int result = prStatement.executeUpdate();
-
-            if (result == 0) {
-                throw new SQLException("Ошибка обновления");
-
+                if (prStatement.executeUpdate() > 0) {
+                    return true;
+                } else {
+                    throw new SQLException("Ошибка обновления");
+                }
             }
-
         } catch (SQLException e) {
-            e.getMessage();
             throw new DataBaseException("Ошибка обновления");
         }
-        return findAll();
+    }
+
+    @Override
+    public Songs map(ResultSet result) throws SQLException {
+
+        int id = result.getInt("id_song");
+        String nameSong = result.getString("name_song");
+        Singers singer = new SingersRepositoryImpl().findById(result.getInt("singer"));
+
+        return new Songs(id, nameSong, singer);
     }
 }

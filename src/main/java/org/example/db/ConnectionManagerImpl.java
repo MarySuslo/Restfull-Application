@@ -7,11 +7,9 @@ import java.sql.SQLException;
 import java.util.Properties;
 
 public class ConnectionManagerImpl implements ConnectionManager {
-    @Override
-    public Connection getConnection() {
 
-        Connection connection = null;
-
+    public String[] getPropertyData() {
+        String[] propertyData = new String[3];
         Properties properties = new Properties();
         try (InputStream inFile = ConnectionManagerImpl.class.getClassLoader().getResourceAsStream("db.properties")) {
             properties.load(inFile);
@@ -19,19 +17,31 @@ public class ConnectionManagerImpl implements ConnectionManager {
             throw new IllegalStateException();
         }
 
-        try {
+        propertyData[0] = properties.getProperty("db.url");
+        propertyData[1] = properties.getProperty("db.username");
+        propertyData[2] = properties.getProperty("db.password");
 
-            String classDriver = properties.getProperty("db.driver-class-name");
-            String urlDB = properties.getProperty("db.url");
-            String username = properties.getProperty("db.username");
-            String password = properties.getProperty("db.password");
+        return propertyData;
+    }
+
+    @Override
+    public Connection getConnection() {
+
+        Connection connection = null;
+
+        try {
+            String[] propertyData = getPropertyData();
+
+            String urlDB = propertyData[0];
+            String username = propertyData[1];
+            String password = propertyData[2];
 
             DriverManager.registerDriver(new org.postgresql.Driver());
 
             connection = DriverManager.getConnection(urlDB, username, password);
 
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            e.getMessage();
         }
         return connection;
     }

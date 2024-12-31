@@ -1,12 +1,10 @@
-package org.example.model;
+package org.example.servlet.dto;
 
-
-public class Singers {
-
+public class SingersDto {
     private int idSinger;
     private String nameSinger;
 
-    public Singers(int idSinger, String nameSinger) {
+    public SingersDto(int idSinger, String nameSinger) {
         this.idSinger = idSinger;
         this.nameSinger = nameSinger;
     }
@@ -24,14 +22,12 @@ public class Singers {
     }
 
     public void setNameSinger(String nameSinger) {
+
         this.nameSinger = nameSinger;
     }
 
     @Override
     public String toString() {
-        return "Singer: {\n" +
-                " id: " + idSinger + ";\n" +
-                " name: " + nameSinger + ";\n}";
+        return "Singer: {\n" + " id: " + idSinger + ";\n" + " name: " + nameSinger + ";\n}";
     }
-
 }

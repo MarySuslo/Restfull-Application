@@ -1,66 +1,30 @@
 package org.example.repository.impl;
 
-import org.example.Errors.DataBaseException;
+import com.zaxxer.hikari.HikariConfig;
 import org.example.Errors.DuplicateDataException;
 import org.example.Errors.NotFoundException;
 import org.example.db.ConnectionManager;
 import org.example.db.ConnectionManagerImpl;
 import org.example.model.Singers;
-import org.example.model.Songs;
 import org.example.repository.SingersRepositoryImpl;
-import org.example.repository.SongsRepositoryImpl;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
-import org.testcontainers.containers.*;
-
-import org.testcontainers.junit.jupiter.Container;
-
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static java.sql.DriverManager.getConnection;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class SingersRepositoryImplTest {
 
-    //создаем здесь testcontainer
-    @Container
-    public static final PostgreSQLContainer<?> container =
-            new PostgreSQLContainer<>("postgres:15")
-                    .withDatabaseName("Music")
-                    .withUsername("postgres")
-                    .withInitScript("db_migration.SQL")
-                    .withPassword("111");
- /*       @BeforeAll
-   public static void setUp() {
-
-        container.start();
-    }*/
 
     @Test
     void findById() {
         int id = 1;
         Singers singer = new SingersRepositoryImpl().findById(id);
 
-        String resultSinger = "";
-
-        ConnectionManager connectionManager = new ConnectionManagerImpl();
-        try (Connection connection = connectionManager.getConnection()) {
-
-            PreparedStatement prStatement = connection.prepareStatement("select * from singers " +
-                    "where id_singer=" + id + " order by id_singer");
-            ResultSet result = prStatement.executeQuery();
-            while (result.next()) {
-                int singerId = result.getInt("id_singer");
-                String nameSinger = result.getString("name_singer");
-
-                resultSinger = (new Singers(singerId, nameSinger)).toString();
-            }
-        } catch (SQLException e) {
-            e.getMessage();
-        }
+        String resultSinger = "Singer: {\n id: 1;\n name: King of jockers;\n}";
 
         assertEquals(resultSinger, singer.toString());
 
@@ -69,11 +33,10 @@ public class SingersRepositoryImplTest {
         } catch (NotFoundException e) {
             assertEquals("Исполнителя с таким индексон не найдено", e.getMessage());
         }
-
     }
 
     @Test
-    void findAll() {
+    void findAll() throws SQLException {
         List<Singers> singers = new SingersRepositoryImpl().findAll();
 
         List<String> finfSingers = new ArrayList<>();
@@ -90,9 +53,8 @@ public class SingersRepositoryImplTest {
 
                 finfSingers.add((new Singers(id, nameSinger)).toString());
             }
-        } catch (SQLException e) {
-            e.getMessage();
         }
+
 
         assertEquals(finfSingers, singers.stream().map(Singers::toString).collect(Collectors.toList()));
 
@@ -101,9 +63,12 @@ public class SingersRepositoryImplTest {
     @Test
     void save() {
         Singers singer = new Singers(4, "Splin");
-        assertTrue(new SingersRepositoryImpl().save(singer));
 
-        Singers singerError = new Singers(3, "Splin");
+        new SingersRepositoryImpl().save(singer);
+        Singers result = new SingersRepositoryImpl().findById(4);
+
+        assertEquals(singer.toString(), result.toString());
+        Singers singerError = new Singers(4, "Splin");
         assertThrows(DuplicateDataException.class, () -> {
             new SingersRepositoryImpl().save(singerError);
         });
@@ -113,12 +78,7 @@ public class SingersRepositoryImplTest {
     void deleteById() {
 
         assertTrue(new SingersRepositoryImpl().deleteById(4));
-
-        try {
-            new SingersRepositoryImpl().deleteById(7);
-        } catch (DataBaseException e) {
-            assertEquals("Ошибка удаления", e.getMessage());
-        }
+        assertFalse(new SingersRepositoryImpl().deleteById(7));
     }
 
     @Test
@@ -130,13 +90,30 @@ public class SingersRepositoryImplTest {
 
         Singers singer2 = new SingersRepositoryImpl().findById(1);
         singer2.setNameSinger("King of jockers");
-        new SingersRepositoryImpl().update(singer2);
-        Singers updateSinger2 = new SingersRepositoryImpl().findById(1);
-        assertEquals(updateSinger2.toString(), singer2.toString());
 
-        assertThrows(DataBaseException.class, () -> {
-            new SingersRepositoryImpl().update(new Singers(8, "TDG"));
-        });
+        assertTrue(new SingersRepositoryImpl().update(singer2));
+
+        Singers singer3 = new Singers(6, "TDG");
+
+        assertFalse(new SingersRepositoryImpl().update(singer3));
+
+    }
+
+    @AfterAll
+    public static void endDate() {
+
+        ConnectionManager connectionManager = new ConnectionManagerImpl();
+        try (Connection connection = connectionManager.getConnection()) {
+
+            PreparedStatement prSongStatement = connection.prepareStatement("truncate table songs");
+            prSongStatement.executeUpdate();
+
+            PreparedStatement prSingersStatement = connection.prepareStatement("truncate table singers cascade");
+            prSingersStatement.executeUpdate();
+
+        } catch (SQLException e) {
+            e.getMessage();
+        }
 
     }
 }

@@ -1,5 +1,6 @@
 package org.example.model;
 
+
 public class Songs {
 
     private int idSong;
@@ -16,6 +17,9 @@ public class Songs {
         return idSong;
     }
 
+    public void setIdSong(int idSong) {
+        this.idSong = idSong;
+    }
 
     public String getNameSong() {
         return nameSong;

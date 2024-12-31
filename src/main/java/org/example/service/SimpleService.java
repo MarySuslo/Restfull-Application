@@ -1,12 +1,11 @@
 package org.example.service;
 
-import org.example.model.Songs;
 
-public interface SimpleService {
+public interface SimpleService<T> {
 
-    Songs findById(int id);
+    T findById(int id);
 
-    void saveSong(Songs song);
+    boolean save(T song);
 
 }
 

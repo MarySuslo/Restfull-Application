@@ -4,12 +4,13 @@
 
 <web-app>
   <display-name>Archetype Created Web Application</display-name>
+
   <servlet>
-    <servlet-name>SimpleServlet</servlet-name>
-    <servlet-class>org.example.servlet.SimpleServlet</servlet-class>
+    <servlet-name>SongsServlet</servlet-name>
+    <servlet-class>org.example.servlet.SongsServlet</servlet-class>
   </servlet>
   <servlet-mapping>
-    <servlet-name>SimpleServlet</servlet-name>
+    <servlet-name>SongsServlet</servlet-name>
     <url-pattern></url-pattern>
   </servlet-mapping>
 </web-app>
