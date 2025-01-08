@@ -1,5 +1,9 @@
 package org.example.repository.impl;
 
+import com.github.dockerjava.api.model.ExposedPort;
+import com.github.dockerjava.api.model.HostConfig;
+import com.github.dockerjava.api.model.PortBinding;
+import com.github.dockerjava.api.model.Ports;
 import com.zaxxer.hikari.HikariConfig;
 import org.example.Errors.DuplicateDataException;
 import org.example.Errors.NotFoundException;
@@ -8,7 +12,12 @@ import org.example.db.ConnectionManagerImpl;
 import org.example.model.Singers;
 import org.example.repository.SingersRepositoryImpl;
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.utility.DockerImageName;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +27,19 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class SingersRepositoryImplTest {
 
+    @Container
+    public static PostgreSQLContainer<?> container = new PostgreSQLContainer<>(DockerImageName.parse("postgres:17.2"))
+            .withDatabaseName("Music")
+                .withUsername("postgres")
+            .withPassword("111")
+            .withExposedPorts(5432)
+            .withInitScript("db_migration.sql");
+
+    @BeforeAll
+    public static void setUp() {
+
+        container.start();
+    }
 
     @Test
     void findById() {
@@ -114,6 +136,6 @@ public class SingersRepositoryImplTest {
         } catch (SQLException e) {
             e.getMessage();
         }
-
+container.close();
     }
 }
