@@ -1,12 +1,11 @@
--- Создание таблицы singers, если она не существует
-CREATE TABLE IF NOT EXISTS singers
+
+CREATE TABLE IF NOT EXISTS public.singers
 (
-    id_singer integer NOT NULL,
-    name_singer character varying(30) COLLATE pg_catalog."default" NOT NULL,
-    CONSTRAINT singers_pkey PRIMARY KEY (id_singer)
+    id_singer integer NOT NULL ,
+    name_singer character varying(30)  NOT NULL,
+    PRIMARY KEY (id_singer)
     );
 
--- Создание таблицы songs, если она не существует
 CREATE TABLE IF NOT EXISTS songs
 (
     id_song integer NOT NULL,
