@@ -7,9 +7,10 @@ import java.sql.SQLException;
 import java.util.Properties;
 
 public class ConnectionManagerImpl implements ConnectionManager {
+    final String[] PROPERTY_DATE = new String[3];
 
     public String[] getPropertyData() {
-        String[] propertyData = new String[3];
+
         Properties properties = new Properties();
         try (InputStream inFile = ConnectionManagerImpl.class.getClassLoader().getResourceAsStream("db.properties")) {
             properties.load(inFile);
@@ -17,32 +18,28 @@ public class ConnectionManagerImpl implements ConnectionManager {
             throw new IllegalStateException();
         }
 
-        propertyData[0] = properties.getProperty("db.url");
-        propertyData[1] = properties.getProperty("db.username");
-        propertyData[2] = properties.getProperty("db.password");
+        PROPERTY_DATE[0] = properties.getProperty("db.url");
+        PROPERTY_DATE[1] = properties.getProperty("db.username");
+        PROPERTY_DATE[2] = properties.getProperty("db.password");
 
-        return propertyData;
+        return PROPERTY_DATE;
     }
 
     @Override
-    public Connection getConnection() {
+    public Connection getConnection() throws SQLException {
 
         Connection connection = null;
 
-        try {
-            String[] propertyData = getPropertyData();
+        String[] propertyData = getPropertyData();
 
-            String urlDB = propertyData[0];
-            String username = propertyData[1];
-            String password = propertyData[2];
+        String urlDB = propertyData[0];
+        String username = propertyData[1];
+        String password = propertyData[2];
 
-            DriverManager.registerDriver(new org.postgresql.Driver());
+        DriverManager.registerDriver(new org.postgresql.Driver());
 
-            connection = DriverManager.getConnection(urlDB, username, password);
+        connection = DriverManager.getConnection(urlDB, username, password);
 
-        } catch (SQLException e) {
-            e.getMessage();
-        }
         return connection;
     }
 }

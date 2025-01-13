@@ -13,6 +13,8 @@ import org.example.service.impl.SongsServiceImpl;
 import org.example.servlet.dto.SingersDto;
 import org.example.servlet.dto.SongsDto;
 import org.example.servlet.mapper.SimpleDtomapper;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -32,18 +34,13 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
-class SimpleServletTest {
+class SongsServletTest {
 
     @Mock
     private SongsServiceImpl songsService;
 
     @Mock
-    private SingersServiceImpl singersService;
-
-    @Mock
     private SimpleDtomapper<Songs, SongsDto> songsMapper;
-    @Mock
-    private SimpleDtomapper<Singers, SingersDto> singersMapper;
 
     @Mock
     private SingersRepositoryImpl singersRepository;
@@ -54,10 +51,21 @@ class SimpleServletTest {
     @InjectMocks
     private SongsServlet songsServlet;
 
-    @InjectMocks
-    private SingersServlet singersServlet;
-
     private Gson gson;
+
+    @BeforeAll
+    public static void startUp(){
+
+        new SingersRepositoryImpl().save( new Singers(1, "KingAndJocker"));
+        new SingersRepositoryImpl().save( new Singers(2, "Windmill"));
+
+
+        Songs song1 = new Songs(1,"Confession of a Vampire", new Singers(1, "KingAndJocker"));
+   new SongsRepositoryImpl().save(song1);
+
+        Songs song2 = new Songs(2, "Wild grasses", new Singers(2, "Windmill"));
+        new SongsRepositoryImpl().save(song2);
+    }
 
     @BeforeEach
     public void setUp() {
@@ -65,7 +73,7 @@ class SimpleServletTest {
     }
 
     @Test
-    void doGetSongServlet() throws ServletException, IOException {
+    void doGet() throws ServletException, IOException {
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
 
@@ -76,8 +84,8 @@ class SimpleServletTest {
         Singers singer = new Singers(1, "KingAndJocker");
         Songs song = new Songs(id, nameSong, singer);
         SongsDto songDto = new SongsDto(id, nameSong, singer);
-        singersRepository.save(singer);
-        songsRepository.save(song);
+      //  singersRepository.save(singer);
+      //  songsRepository.save(song);
 
         when(songsService.findById(id)).thenReturn(song);
         when(songsMapper.mapToDto(song)).thenReturn(songDto);
@@ -95,15 +103,15 @@ class SimpleServletTest {
     }
 
     @Test
-    void doPostSongServlet() throws ServletException, IOException {
+    void doPost() throws ServletException, IOException {
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
 
-        when(request.getParameter("idSong")).thenReturn("5");
+        when(request.getParameter("idSong")).thenReturn("3");
         when(request.getParameter("name")).thenReturn("Dugon");
         when(request.getParameter("idSinger")).thenReturn("1");
 
-        int id = 5;
+        int id = 3;
         String nameSong = "Dugon";
         int singerId = 1;
         String nameSinger = "KingAndJocker";
@@ -129,17 +137,70 @@ class SimpleServletTest {
     }
 
     @Test
-    void doGetStartSongServlet() throws ServletException, IOException {
+    void doPut() throws ServletException, IOException {
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        HttpServletResponse response = mock(HttpServletResponse.class);
+
+        when(request.getParameter("idSong")).thenReturn("2");
+        when(request.getParameter("name")).thenReturn("Way of dream");
+        when(request.getParameter("idSinger")).thenReturn("2");
+
+        int id = 2;
+        String nameSong = "Way of dream";
+        int singerId = 2;
+        String nameSinger = "Windmill";
+        Singers singer = new Singers(singerId, nameSinger);
+        Songs song = new Songs(id, nameSong, singer);
+        SongsDto songDto = new SongsDto(id, nameSong, singer);
+
+        when(singersRepository.findById(singerId)).thenReturn(singer);
+        when(songsMapper.mapFromDto(any(SongsDto.class))).thenReturn(song);
+        when(songsService.findById(id)).thenReturn(song);
+        when(songsMapper.mapToDto(song)).thenReturn(songDto);
+
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+
+        when(response.getWriter()).thenReturn(pw);
+
+        songsServlet.doPut(request, response);
+        verify(response).setContentType("application/json");
+
+        assertEquals(gson.toJson(songDto), sw.toString());
+
+    }
+
+    @Test
+    void doDelete()throws ServletException, IOException{
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        HttpServletResponse response = mock(HttpServletResponse.class);
+
+        when(request.getParameter("id")).thenReturn("3");
+
+       // int id = 5;
+
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+
+        when(response.getWriter()).thenReturn(pw);
+
+        songsServlet.doDelete(request, response);
+        verify(response).setContentType("application/json");
+
+        assertEquals("\"{\\\"message\\\": \\\"Song deleted successfully\\\"}\"", sw.toString());
+    }
+
+    @Test
+    void doGetStart() throws ServletException, IOException {
 
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
 
         Songs song1 = new Songs(1, "Confession of a Vampire", new Singers(1, "KingAndJocker"));
-        Songs song2 = new Songs(2, "Wild grasses", new Singers(2, "Windmill"));
-        Songs song3 = new Songs(3, "Star of name Sun", new Singers(3, "Movie"));
-        Songs song4 = new Songs(5, "Dugon", new Singers(1, "KingAndJocker"));
 
-        List<Songs> songs = Arrays.asList(song1, song2, song3, song4);
+        Songs song2 = new Songs(2, "Way of dream", new Singers(2, "Windmill"));
+        //
+        List<Songs> songs = Arrays.asList( song1,song2);
 
         when(songsRepository.findAll()).thenReturn(songs);
 
@@ -154,86 +215,13 @@ class SimpleServletTest {
         assertEquals(gson.toJson(songs), sw.toString());
     }
 
-    @Test
-    void doGetSingerServlet() throws ServletException, IOException {
-        HttpServletRequest request = mock(HttpServletRequest.class);
-        HttpServletResponse response = mock(HttpServletResponse.class);
+    @AfterAll
+    public static void end(){
 
-        when(request.getParameter("id")).thenReturn("1");
+        new SingersRepositoryImpl().deleteById(1);
+        new SingersRepositoryImpl().deleteById(2);
 
-        int id = 1;
-        String nameSinger = "KingAndJocker";
-        Singers singer = new Singers(id, nameSinger);
-        SingersDto singerDto = new SingersDto(id, nameSinger);
-        singersRepository.save(singer);
-
-        when(singersService.findById(id)).thenReturn(singer);
-        when(singersMapper.mapToDto(singer)).thenReturn(singerDto);
-
-        StringWriter sw = new StringWriter();
-        PrintWriter pw = new PrintWriter(sw);
-
-        when(response.getWriter()).thenReturn(pw);
-
-        singersServlet.doGet(request, response);
-
-        verify(response).setContentType("application/json");
-
-        assertEquals(gson.toJson(singerDto), sw.toString());
-    }
-
-    @Test
-    void doPostSingerServlet() throws ServletException, IOException {
-        HttpServletRequest request = mock(HttpServletRequest.class);
-        HttpServletResponse response = mock(HttpServletResponse.class);
-
-        when(request.getParameter("idSinger")).thenReturn("5");
-        when(request.getParameter("name")).thenReturn("Stray Kids");
-
-        int id = 5;
-        String nameSinger = "Stray Kids";
-        Singers singer = new Singers(id, nameSinger);
-        SingersDto singerDto = new SingersDto(id, nameSinger);
-
-        when(singersMapper.mapFromDto(any(SingersDto.class))).thenReturn(singer);
-        when(singersService.findById(id)).thenReturn(singer);
-        when(singersMapper.mapToDto(singer)).thenReturn(singerDto);
-
-        StringWriter sw = new StringWriter();
-        PrintWriter pw = new PrintWriter(sw);
-
-        when(response.getWriter()).thenReturn(pw);
-
-        singersServlet.doPost(request, response);
-        verify(response).setContentType("application/json");
-
-        assertEquals(gson.toJson(singerDto), sw.toString());
-
-    }
-
-    @Test
-    void doGetStartSingerServlet() throws ServletException, IOException {
-
-        HttpServletRequest request = mock(HttpServletRequest.class);
-        HttpServletResponse response = mock(HttpServletResponse.class);
-
-        Singers singer1 = new Singers(1, "KingAndJocker");
-        Singers singer2 = new Singers(2, "Windmill");
-        Singers singer3 = new Singers(3, "Movie");
-        Singers singer4 = new Singers(5, "Stray Kids");
-
-        List<Singers> singers = Arrays.asList(singer1, singer2, singer3, singer4);
-
-        when(singersRepository.findAll()).thenReturn(singers);
-
-        StringWriter sw = new StringWriter();
-        PrintWriter pw = new PrintWriter(sw);
-
-        when(response.getWriter()).thenReturn(pw);
-
-        singersServlet.doGet(request, response);
-
-        verify(response).setContentType("application/json");
-        assertEquals(gson.toJson(singers), sw.toString());
+        new SongsRepositoryImpl().deleteById(1);
+        new SongsRepositoryImpl().deleteById(2);
     }
 }

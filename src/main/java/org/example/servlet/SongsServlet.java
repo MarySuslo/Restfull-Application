@@ -11,6 +11,7 @@ import org.example.model.Songs;
 import org.example.repository.SingersRepositoryImpl;
 import org.example.repository.SongsRepositoryImpl;
 import org.example.service.impl.SongsServiceImpl;
+import org.example.servlet.dto.SingersDto;
 import org.example.servlet.dto.SongsDto;
 import org.example.servlet.mapper.SongsDtomapperImpl;
 
@@ -76,4 +77,38 @@ public class SongsServlet extends HttpServlet {
         resp.getWriter().write(gson.toJson(songsDto));
     }
 
+    @Override
+    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        resp.setContentType("application/json");
+
+        String parametrId = req.getParameter("idSong");
+        int id = Integer.parseInt(parametrId);
+        String parametrName = req.getParameter("name");
+        String parametrIdSinger = req.getParameter("idSinger");
+        int idSinger = Integer.parseInt(parametrIdSinger);
+
+        Singers singer = singersRepository.findById(idSinger);
+
+        Songs song = dtomapper.mapFromDto(new SongsDto(id, parametrName, singer));
+
+        service.update(song);
+
+        SongsDto songsDto = dtomapper.mapToDto(service.findById(song.getIdSong()));
+
+        resp.getWriter().write(gson.toJson(songsDto));
+    }
+
+    @Override
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+
+        String parametrId = req.getParameter("id");
+        resp.setContentType("application/json");
+
+        int id = Integer.parseInt(parametrId);
+
+        service.delete(id);
+
+        resp.getWriter().write(gson.toJson("{\"message\": \"Song deleted successfully\"}"));
+
+    }
 }

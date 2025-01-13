@@ -65,4 +65,35 @@ public class SingersServlet extends HttpServlet {
 
         resp.getWriter().write(gson.toJson(singersDto));
     }
+
+    @Override
+    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        resp.setContentType("application/json");
+
+        String parametrId = req.getParameter("idSinger");
+        int id = Integer.parseInt(parametrId);
+        String parametrName = req.getParameter("name");
+
+        Singers singer = dtomapper.mapFromDto(new SingersDto(id, parametrName));
+
+        service.update(singer);
+
+        SingersDto singersDto = dtomapper.mapToDto(service.findById(singer.getIdSinger()));
+
+        resp.getWriter().write(gson.toJson(singersDto));
+    }
+
+    @Override
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+
+        String parametrId = req.getParameter("id");
+        resp.setContentType("application/json");
+
+        int id = Integer.parseInt(parametrId);
+
+        service.delete(id);
+
+        resp.getWriter().write(gson.toJson("{\"message\": \"Singer deleted successfully\"}"));
+
+    }
 }

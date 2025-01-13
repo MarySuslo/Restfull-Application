@@ -7,11 +7,15 @@ public class SingersDtomapperImpl implements SimpleDtomapper<Singers, SingersDto
 
     @Override
     public Singers mapFromDto(SingersDto singerDto) {
-        return new Singers(singerDto.getIdSinger(), singerDto.getNameSinger());
+        Singers singer = new Singers(singerDto.getIdSinger(), singerDto.getNameSinger());
+        singer.setSongs(singerDto.getSongs());
+        return singer;
     }
 
     @Override
     public SingersDto mapToDto(Singers singer) {
-        return new SingersDto(singer.getIdSinger(), singer.getNameSinger());
+        SingersDto singersDto = new SingersDto(singer.getIdSinger(), singer.getNameSinger());
+        singersDto.setSongs(singer.getSongs());
+        return singersDto;
     }
 }

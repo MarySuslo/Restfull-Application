@@ -9,10 +9,13 @@ import org.example.model.Singers;
 import org.example.model.Songs;
 import org.example.repository.SingersRepositoryImpl;
 import org.example.repository.SongsRepositoryImpl;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.*;
 
 import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.utility.DockerImageName;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -24,21 +27,26 @@ import static org.junit.jupiter.api.Assertions.*;
 class SongsRepositoryImplTest {
 
     @Container
-    public static PostgreSQLContainer<?> container =
-            new PostgreSQLContainer<>("postgres:15")
-                    .withDatabaseName("Music")
-                    .withUsername("postgres")
-                    .withInitScript("db-migration.SQL")
-                    .withPassword("111");
+    public static PostgreSQLContainer<?> container = new PostgreSQLContainer<>(DockerImageName.parse("postgres:17.2"))
+            .withDatabaseName("Music")
+            .withUsername("postgres")
+            .withPassword("111")
+            .withExposedPorts(5432)
+            .withInitScript("db_migration.sql");
 
+    @BeforeAll
+    public static void setUp() {
+
+        container.start();
+    }
     @Test
     void save() {
 
         Singers singer= new Singers(2,"Windmill");
-        Songs song = new Songs(4, "Rapunzel", singer);
+        Songs song = new Songs(5, "Rapunzel", singer);
 
         new SongsRepositoryImpl().save(song);
-        Songs savedSong = new SongsRepositoryImpl().findById(4);
+        Songs savedSong = new SongsRepositoryImpl().findById(5);
 
         assertEquals(savedSong.toString(), song.toString());
         Songs songsError = new Songs(4, "Rapunzel", singer);
@@ -53,8 +61,7 @@ class SongsRepositoryImplTest {
         String songName = "Star of name Sun";
         Singers singer = new Singers(3,"Movie");
         Songs song = new Songs(id, songName, singer);
-        new SingersRepositoryImpl().save(singer);
-        new SongsRepositoryImpl().save(song);
+
         String resultSong = new SongsRepositoryImpl().findById(3).toString();
 
         assertEquals(resultSong, song.toString());
@@ -98,7 +105,7 @@ class SongsRepositoryImplTest {
     @Test
     void deleteById() {
 
-        assertTrue(new SongsRepositoryImpl().deleteById(4));
+        assertTrue(new SongsRepositoryImpl().deleteById(5));
 
         try {
             new SongsRepositoryImpl().deleteById(-8);
@@ -112,19 +119,10 @@ class SongsRepositoryImplTest {
 
         Singers singer = new Singers(1,"KingAndJocker");
         Singers newSinger = new Singers(2,"Windmill");
-       SingersRepositoryImpl singersRepository=new SingersRepositoryImpl();
-        singersRepository.save(newSinger);
-        singersRepository.save(singer);
-        int songId1 = 1;
-        String nameSong1 = "Confession of a Vampire";
-        Songs song1 = new Songs(songId1, nameSong1, singer);
-        int songId2 = 2;
-        String nameSong2 = "Withards doll";
-        Songs song2 = new Songs(songId2, nameSong2, singer);
-        SongsRepositoryImpl songsRepository=new SongsRepositoryImpl();
-        songsRepository.save(song1);
-        songsRepository.save(song2);
 
+       SingersRepositoryImpl singersRepository=new SingersRepositoryImpl();
+
+        SongsRepositoryImpl songsRepository=new SongsRepositoryImpl();
 
         Songs song = new Songs(2, "Good pirate", singersRepository.findById(1));
         songsRepository.update(song);
@@ -148,4 +146,9 @@ class SongsRepositoryImplTest {
 
     }
 
+    @AfterAll
+    public static void endDate() {
+
+        container.stop();
+    }
 }

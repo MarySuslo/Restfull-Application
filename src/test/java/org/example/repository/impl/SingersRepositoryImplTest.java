@@ -124,7 +124,7 @@ public class SingersRepositoryImplTest {
     @AfterAll
     public static void endDate() {
 
-        ConnectionManager connectionManager = new ConnectionManagerImpl();
+     /*   ConnectionManager connectionManager = new ConnectionManagerImpl();
         try (Connection connection = connectionManager.getConnection()) {
 
             PreparedStatement prSongStatement = connection.prepareStatement("truncate table songs");
@@ -135,7 +135,7 @@ public class SingersRepositoryImplTest {
 
         } catch (SQLException e) {
             e.getMessage();
-        }
-container.close();
+        }*/
+container.stop();
     }
 }

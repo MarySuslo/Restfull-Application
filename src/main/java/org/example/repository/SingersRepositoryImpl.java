@@ -36,12 +36,13 @@ public class SingersRepositoryImpl implements SimpleRepository<Singers> {
             }
             if (singer == null)
                 throw new SQLException();
-            else return singer;
+
 
         } catch (SQLException e) {
-            throw new NotFoundException("Исполнителя с таким индексон не найдено");
+            e.getMessage();
+            // throw new NotFoundException("Исполнителя с таким индексон не найдено");
         }
-
+        return singer;
     }
 
     @Override

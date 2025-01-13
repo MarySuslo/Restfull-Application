@@ -57,11 +57,8 @@ public class SongsRepositoryImpl implements SimpleRepository<Songs> {
         try (Connection connection = connectionManager.getConnection()) {
             try (PreparedStatement prStatement = connection.prepareStatement(deleteByIdSQL)) {
                 prStatement.setInt(1, id);
-                if (prStatement.executeUpdate() > 0) {
-                    return true;
-                } else {
-                    throw new SQLException("Ошибка удаления");
-                }
+                return prStatement.executeUpdate() > 0;
+
             }
         } catch (SQLException e) {
             throw new DataBaseException("Ошибка удаления");
@@ -99,7 +96,7 @@ public class SongsRepositoryImpl implements SimpleRepository<Songs> {
                 prStatement.setString(2, song.getNameSong());
                 prStatement.setInt(3, song.getSinger().getIdSinger());
                 prStatement.executeUpdate();
-                //  song.getSinger().getSongs().add(song);
+                song.getSinger().getSongs().add(song);
 
                 return song.getIdSong() > 0;
             }

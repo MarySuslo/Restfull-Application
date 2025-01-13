@@ -59,7 +59,6 @@ class SimpleServiceImplTest {
     @Test
     void saveSong() {
 
-
         int songId = 1;
         String songName = "Confession of a Vampire";
         Singers singer = new Singers(1, "KingAndJocker");
