@@ -1,10 +1,6 @@
 package org.example.repository.impl;
 
-import com.github.dockerjava.api.model.ExposedPort;
-import com.github.dockerjava.api.model.HostConfig;
-import com.github.dockerjava.api.model.PortBinding;
-import com.github.dockerjava.api.model.Ports;
-import com.zaxxer.hikari.HikariConfig;
+import org.example.Errors.DataBaseException;
 import org.example.Errors.DuplicateDataException;
 import org.example.Errors.NotFoundException;
 import org.example.db.ConnectionManager;
@@ -28,11 +24,11 @@ import static org.junit.jupiter.api.Assertions.*;
 public class SingersRepositoryImplTest {
 
     @Container
-    public static PostgreSQLContainer<?> container = new PostgreSQLContainer<>(DockerImageName.parse("postgres:17.2"))
+    public static PostgreSQLContainer<?> container = new PostgreSQLContainer<>(DockerImageName.parse("postgres:17"))
+
             .withDatabaseName("Music")
-                .withUsername("postgres")
+            .withUsername("postgres")
             .withPassword("111")
-            .withExposedPorts(5432)
             .withInitScript("db_migration.sql");
 
     @BeforeAll
@@ -117,25 +113,12 @@ public class SingersRepositoryImplTest {
 
         Singers singer3 = new Singers(6, "TDG");
 
-        assertFalse(new SingersRepositoryImpl().update(singer3));
+        assertThrows(DataBaseException.class, () -> {new SingersRepositoryImpl().update(singer3);});
 
     }
 
     @AfterAll
     public static void endDate() {
-
-     /*   ConnectionManager connectionManager = new ConnectionManagerImpl();
-        try (Connection connection = connectionManager.getConnection()) {
-
-            PreparedStatement prSongStatement = connection.prepareStatement("truncate table songs");
-            prSongStatement.executeUpdate();
-
-            PreparedStatement prSingersStatement = connection.prepareStatement("truncate table singers cascade");
-            prSingersStatement.executeUpdate();
-
-        } catch (SQLException e) {
-            e.getMessage();
-        }*/
-container.stop();
+        container.stop();
     }
 }

@@ -42,7 +42,7 @@ public class SongsRepositoryImpl implements SimpleRepository<Songs> {
             if (song != null) {
                 return song;
             } else {
-                throw new SQLException("Песня не найдена");
+                throw new SQLException();
             }
         } catch (SQLException e) {
             throw new NotFoundException("Песни с таким индексон не найдено");
@@ -81,7 +81,7 @@ public class SongsRepositoryImpl implements SimpleRepository<Songs> {
                 }
             }
         } catch (SQLException e) {
-            e.getMessage();
+            throw new DataBaseException("Ошибка чтения");
         }
 
         return songsList;
@@ -114,11 +114,8 @@ public class SongsRepositoryImpl implements SimpleRepository<Songs> {
                 prStatement.setInt(2, song.getSinger().getIdSinger());
                 prStatement.setInt(3, song.getIdSong());
 
-                if (prStatement.executeUpdate() > 0) {
-                    return true;
-                } else {
-                    throw new SQLException("Ошибка обновления");
-                }
+                    return prStatement.executeUpdate() > 0;
+
             }
         } catch (SQLException e) {
             throw new DataBaseException("Ошибка обновления");

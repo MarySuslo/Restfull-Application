@@ -1,4 +1,3 @@
-
 CREATE TABLE IF NOT EXISTS public.singers
 (
     id_singer integer NOT NULL,
@@ -18,14 +17,13 @@ CREATE TABLE IF NOT EXISTS public.songs
     ON DELETE NO ACTION
     );
 
+truncate table songs;
+truncate table singers cascade;
 
-
--- Вставка данных в таблицу singers
 INSERT INTO singers (id_singer, name_singer) VALUES (1, 'KingAndJocker');
 INSERT INTO singers (id_singer, name_singer) VALUES (2, 'Windmill');
 INSERT INTO singers (id_singer, name_singer) VALUES (3, 'Movie');
 
--- Вставка данных в таблицу songs
 INSERT INTO songs (id_song, name_song, singer) VALUES (1, 'Confession of a Vampire', 1);
 INSERT INTO songs (id_song, name_song, singer) VALUES (2, 'Withards doll', 1);
 INSERT INTO songs (id_song, name_song, singer) VALUES (3, 'Star of name Sun', 3);

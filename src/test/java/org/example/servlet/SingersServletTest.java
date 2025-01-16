@@ -1,16 +1,13 @@
 package org.example.servlet;
+
 import com.google.gson.Gson;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.example.model.Singers;
-import org.example.model.Songs;
 import org.example.repository.SingersRepositoryImpl;
-import org.example.repository.SongsRepositoryImpl;
 import org.example.service.impl.SingersServiceImpl;
-import org.example.service.impl.SongsServiceImpl;
 import org.example.servlet.dto.SingersDto;
-import org.example.servlet.dto.SongsDto;
 import org.example.servlet.mapper.SimpleDtomapper;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -49,18 +46,9 @@ public class SingersServletTest {
 
     private Gson gson;
 
-    @BeforeAll
-    public static void startUp(){
-
-        new SingersRepositoryImpl().save( new Singers(1, "King of jockers"));
-        new SingersRepositoryImpl().save( new Singers(2, "Windmill"));
-        new SingersRepositoryImpl().save( new Singers(3, "Movie"));
-    }
-
     @BeforeEach
     public void setUp() {
         gson = new Gson();
-
     }
 
     @Test
@@ -71,7 +59,7 @@ public class SingersServletTest {
         when(request.getParameter("id")).thenReturn("1");
 
         int id = 1;
-        String nameSinger = "King of jockers";
+        String nameSinger = "KingAndJocker";
         Singers singer = new Singers(id, nameSinger);
         SingersDto singerDto = new SingersDto(id, nameSinger);
 
@@ -173,10 +161,9 @@ public class SingersServletTest {
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
 
-        Singers singer1 = new Singers(1, "King of jockers");
+        Singers singer1 = new Singers(1, "KingAndJocker");
         Singers singer2 = new Singers(2, "Windmill");
         Singers singer3 = new Singers(3, "Cinema");
-       // Singers singer4 = new Singers(4, "Stray Kids");  , singer4
 
         List<Singers> singers = Arrays.asList(singer1, singer2, singer3);
 
@@ -193,11 +180,4 @@ public class SingersServletTest {
         assertEquals(gson.toJson(singers), sw.toString());
     }
 
-    @AfterAll
-    public static void end(){
-
-        new SingersRepositoryImpl().deleteById(1);
-        new SingersRepositoryImpl().deleteById(2);
-        new SingersRepositoryImpl().deleteById(3);
-    }
 }

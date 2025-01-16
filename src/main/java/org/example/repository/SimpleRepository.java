@@ -6,11 +6,11 @@ import java.util.List;
 
 public interface SimpleRepository<T> {
 
-    T findById(int id);
+    T findById(int id) ;
 
     boolean deleteById(int id);
 
-    List<T> findAll();
+    List<T> findAll() ;
 
     boolean save(T t);
 

@@ -22,7 +22,7 @@ public class SingersRepositoryImpl implements SimpleRepository<Singers> {
     String updateSingerSQL = "UPDATE singers SET name_singer=? WHERE id_singer=?";
 
     @Override
-    public Singers findById(int id) {
+    public Singers findById(int id)  {
         connectionManager = new ConnectionManagerImpl();
         Singers singer = null;
         try (Connection connection = connectionManager.getConnection()) {
@@ -35,12 +35,10 @@ public class SingersRepositoryImpl implements SimpleRepository<Singers> {
                 }
             }
             if (singer == null)
-                throw new SQLException();
-
+                throw  new SQLException();
 
         } catch (SQLException e) {
-            e.getMessage();
-            // throw new NotFoundException("Исполнителя с таким индексон не найдено");
+            throw new NotFoundException("Исполнителя с таким индексон не найдено");
         }
         return singer;
     }
@@ -78,7 +76,7 @@ public class SingersRepositoryImpl implements SimpleRepository<Singers> {
                 }
             }
         } catch (SQLException e) {
-            e.getMessage();
+            throw new DataBaseException("Ошибка чтения");
         }
         return singersList;
     }
@@ -108,9 +106,10 @@ public class SingersRepositoryImpl implements SimpleRepository<Singers> {
                 prStatement.setString(1, singer.getNameSinger());
                 prStatement.setInt(2, singer.getIdSinger());
 
-                return prStatement.executeUpdate() > 0;
+               if(prStatement.executeUpdate() > 0)
+                   return true;
+               else throw  new SQLException();
             }
-
         } catch (SQLException e) {
             throw new DataBaseException("Ошибка обновления");
         }

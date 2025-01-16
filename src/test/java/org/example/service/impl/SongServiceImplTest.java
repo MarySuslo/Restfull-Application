@@ -14,19 +14,13 @@ import org.mockito.MockitoAnnotations;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-class SimpleServiceImplTest {
+class SongServiceImplTest {
 
     @Mock
     private SongsRepositoryImpl songsRepository;
 
-    @Mock
-    private SingersRepositoryImpl singersRepository;
-
     @InjectMocks
     private SongsServiceImpl songService;
-
-    @InjectMocks
-    private SingersServiceImpl singerService;
 
     @BeforeEach
     void setUp() {
@@ -34,7 +28,7 @@ class SimpleServiceImplTest {
     }
 
     @Test
-    void findSongById() {
+    void findById() {
 
         int id = 2;
         String nameSong = "Withards doll";
@@ -57,7 +51,7 @@ class SimpleServiceImplTest {
     }
 
     @Test
-    void saveSong() {
+    void save() {
 
         int songId = 1;
         String songName = "Confession of a Vampire";
@@ -79,48 +73,31 @@ class SimpleServiceImplTest {
     }
 
     @Test
-    void findSingerById() {
+    void deleteById() {
 
-        int id = 1;
+        int id = 3;
 
-        String nameSinger = "KingAndJocker";
+        when(songsRepository.deleteById(id)).thenReturn(true);
 
-        Singers singer = new Singers(id, nameSinger);
+        assertTrue(songService.delete(id));
 
-        when(singersRepository.findById(id)).thenReturn(singer);
-
-        Singers findSinger = singerService.findById(id);
-
-        assertNotNull(findSinger);
-        assertEquals(findSinger.toString(), singer.toString());
-
-        when(singersRepository.findById(8)).thenThrow(
-                new NotFoundException("Исполнителя с таким индексон не найдено"));
-
-        assertThrows(NotFoundException.class, () -> singerService.findById(8));
+        assertFalse(songService.delete(10));
 
     }
 
     @Test
-    void saveSinger() {
+    void update() {
 
-        int id = 1;
+        Singers singer = new Singers(1, "KISH");
+        Songs song = new Songs(2, "rom for peaple", singer);
 
-        String nameSinger = "KingAndJocker";
+        when(songService.update(song)).thenReturn(true);
 
-        Singers singer = new Singers(id, nameSinger);
+        songService.update(song);
 
-        when(singerService.save(singer)).thenReturn(true);
+        verify(songsRepository, times(1)).update(song);
 
-        singerService.save(singer);
+        assertTrue(songService.update(song));
 
-        verify(singersRepository, times(1)).save(singer);
-
-        when(singersRepository.findById(id)).thenReturn(singer);
-
-        Singers resultSinger = singersRepository.findById(id);
-
-        assertNotNull(resultSinger, "Песня должна быть сохранена");
-        assertEquals(resultSinger.toString(), singer.toString());
     }
 }

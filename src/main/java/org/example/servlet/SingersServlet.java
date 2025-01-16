@@ -13,6 +13,7 @@ import org.example.servlet.dto.SingersDto;
 import org.example.servlet.mapper.SingersDtomapperImpl;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.List;
 
 @WebServlet(name = "SingersServlet", value = "/singer")
@@ -32,7 +33,7 @@ public class SingersServlet extends HttpServlet {
     private static Gson gson = new Gson();
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException{
 
         String parametrId = req.getParameter("id");
         resp.setContentType("application/json");

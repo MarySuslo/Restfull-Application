@@ -53,20 +53,6 @@ class SongsServletTest {
 
     private Gson gson;
 
-    @BeforeAll
-    public static void startUp(){
-
-        new SingersRepositoryImpl().save( new Singers(1, "KingAndJocker"));
-        new SingersRepositoryImpl().save( new Singers(2, "Windmill"));
-
-
-        Songs song1 = new Songs(1,"Confession of a Vampire", new Singers(1, "KingAndJocker"));
-   new SongsRepositoryImpl().save(song1);
-
-        Songs song2 = new Songs(2, "Wild grasses", new Singers(2, "Windmill"));
-        new SongsRepositoryImpl().save(song2);
-    }
-
     @BeforeEach
     public void setUp() {
         gson = new Gson();
@@ -81,11 +67,9 @@ class SongsServletTest {
 
         int id = 1;
         String nameSong = "Confession of a Vampire";
-        Singers singer = new Singers(1, "KingAndJocker");
+        Singers singer = new Singers(1, "King of jockers");
         Songs song = new Songs(id, nameSong, singer);
         SongsDto songDto = new SongsDto(id, nameSong, singer);
-      //  singersRepository.save(singer);
-      //  songsRepository.save(song);
 
         when(songsService.findById(id)).thenReturn(song);
         when(songsMapper.mapToDto(song)).thenReturn(songDto);
@@ -107,14 +91,14 @@ class SongsServletTest {
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
 
-        when(request.getParameter("idSong")).thenReturn("3");
+        when(request.getParameter("idSong")).thenReturn("4");
         when(request.getParameter("name")).thenReturn("Dugon");
         when(request.getParameter("idSinger")).thenReturn("1");
 
-        int id = 3;
+        int id = 4;
         String nameSong = "Dugon";
         int singerId = 1;
-        String nameSinger = "KingAndJocker";
+        String nameSinger = "King of jockers";
         Singers singer = new Singers(singerId, nameSinger);
         Songs song = new Songs(id, nameSong, singer);
         SongsDto songDto = new SongsDto(id, nameSong, singer);
@@ -177,8 +161,6 @@ class SongsServletTest {
 
         when(request.getParameter("id")).thenReturn("3");
 
-       // int id = 5;
-
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
 
@@ -196,11 +178,13 @@ class SongsServletTest {
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
 
-        Songs song1 = new Songs(1, "Confession of a Vampire", new Singers(1, "KingAndJocker"));
+        Songs song1 = new Songs(1, "Confession of a Vampire", new Singers(1, "King of jockers"));
 
         Songs song2 = new Songs(2, "Way of dream", new Singers(2, "Windmill"));
-        //
-        List<Songs> songs = Arrays.asList( song1,song2);
+
+        Songs song3 = new Songs(4, "Dugon",new Singers(1, "King of jockers") );
+
+        List<Songs> songs = Arrays.asList( song1,song2, song3);
 
         when(songsRepository.findAll()).thenReturn(songs);
 
@@ -215,13 +199,4 @@ class SongsServletTest {
         assertEquals(gson.toJson(songs), sw.toString());
     }
 
-    @AfterAll
-    public static void end(){
-
-        new SingersRepositoryImpl().deleteById(1);
-        new SingersRepositoryImpl().deleteById(2);
-
-        new SongsRepositoryImpl().deleteById(1);
-        new SongsRepositoryImpl().deleteById(2);
-    }
 }

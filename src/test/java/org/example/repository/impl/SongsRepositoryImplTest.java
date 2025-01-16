@@ -39,17 +39,18 @@ class SongsRepositoryImplTest {
 
         container.start();
     }
+
     @Test
     void save() {
 
-        Singers singer= new Singers(2,"Windmill");
+        Singers singer = new Singers(2, "Windmill");
         Songs song = new Songs(5, "Rapunzel", singer);
 
         new SongsRepositoryImpl().save(song);
         Songs savedSong = new SongsRepositoryImpl().findById(5);
 
         assertEquals(savedSong.toString(), song.toString());
-        Songs songsError = new Songs(4, "Rapunzel", singer);
+        Songs songsError = new Songs(5, "Rapunzel", singer);
         assertThrows(DuplicateDataException.class, () -> {
             new SongsRepositoryImpl().save(songsError);
         });
@@ -59,7 +60,7 @@ class SongsRepositoryImplTest {
     void findById() {
         int id = 3;
         String songName = "Star of name Sun";
-        Singers singer = new Singers(3,"Movie");
+        Singers singer = new Singers(3, "Cinema");
         Songs song = new Songs(id, songName, singer);
 
         String resultSong = new SongsRepositoryImpl().findById(3).toString();
@@ -74,7 +75,7 @@ class SongsRepositoryImplTest {
     }
 
     @Test
-    void findAll() {
+    void findAll() throws SQLException{
 
         List<Songs> songs = new SongsRepositoryImpl().findAll();
         List<String> findSongs = new ArrayList<>();
@@ -87,15 +88,13 @@ class SongsRepositoryImplTest {
             ResultSet result = prStatement.executeQuery();
 
             while (result.next()) {
-                int id =  result.getInt("id_song");
+                int id = result.getInt("id_song");
                 String nameSong = result.getString("name_song");
 
                 Singers singer = new SingersRepositoryImpl().findById(result.getInt("singer"));
 
                 findSongs.add((new Songs(id, nameSong, singer)).toString());
             }
-        } catch (SQLException e) {
-            throw new NotFoundException("Песни не найдено");
         }
 
         assertEquals(findSongs, songs.stream().map(Songs::toString).collect(Collectors.toList()));
@@ -117,12 +116,12 @@ class SongsRepositoryImplTest {
     @Test
     void update() {
 
-        Singers singer = new Singers(1,"KingAndJocker");
-        Singers newSinger = new Singers(2,"Windmill");
+        Singers singer = new Singers(1, "KingAndJocker");
+        Singers newSinger = new Singers(2, "Windmill");
 
-       SingersRepositoryImpl singersRepository=new SingersRepositoryImpl();
+        SingersRepositoryImpl singersRepository = new SingersRepositoryImpl();
 
-        SongsRepositoryImpl songsRepository=new SongsRepositoryImpl();
+        SongsRepositoryImpl songsRepository = new SongsRepositoryImpl();
 
         Songs song = new Songs(2, "Good pirate", singersRepository.findById(1));
         songsRepository.update(song);
