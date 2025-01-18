@@ -43,19 +43,19 @@ public class SingerServiceImplTest {
         assertNotNull(findSinger);
         assertEquals(findSinger.toString(), singer.toString());
 
-        when(singersRepository.findById(8)).thenThrow(
+        when(singersRepository.findById(28)).thenThrow(
                 new NotFoundException("Исполнителя с таким индексон не найдено"));
 
-        assertThrows(NotFoundException.class, () -> singerService.findById(8));
+        assertThrows(NotFoundException.class, () -> singerService.findById(28));
 
     }
 
     @Test
     void save() {
 
-        int id = 1;
+        int id = 9;
 
-        String nameSinger = "KingAndJocker";
+        String nameSinger = "Aria";
 
         Singers singer = new Singers(id, nameSinger);
 
@@ -69,25 +69,26 @@ public class SingerServiceImplTest {
 
         Singers resultSinger = singersRepository.findById(id);
 
-        assertNotNull(resultSinger, "Песня должна быть сохранена");
+        assertNotNull(resultSinger, "Исполнитель должна быть сохранена");
         assertEquals(resultSinger.toString(), singer.toString());
     }
+
     @Test
     void delete() {
-        int id = 3;
+        int id = 7;
 
         when(singersRepository.deleteById(id)).thenReturn(true);
 
         assertTrue(singerService.delete(id));
 
-        assertFalse(singerService.delete(10));
+        assertFalse(singerService.delete(30));
 
     }
 
     @Test
     void update() {
 
-        Singers singer = new Singers(1, "Compos");
+        Singers singer = new Singers(6, "TDG");
 
 
         when(singerService.update(singer)).thenReturn(true);
@@ -96,7 +97,7 @@ public class SingerServiceImplTest {
 
         verify(singersRepository, times(1)).update(singer);
 
-        assertTrue( singerService.update(singer));
+        assertTrue(singerService.update(singer));
     }
 
 

@@ -114,7 +114,7 @@ public class SongsRepositoryImpl implements SimpleRepository<Songs> {
                 prStatement.setInt(2, song.getSinger().getIdSinger());
                 prStatement.setInt(3, song.getIdSong());
 
-                    return prStatement.executeUpdate() > 0;
+                return prStatement.executeUpdate() > 0;
 
             }
         } catch (SQLException e) {

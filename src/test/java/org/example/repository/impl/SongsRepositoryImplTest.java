@@ -1,5 +1,6 @@
 package org.example.repository.impl;
 
+import org.example.DataBaseContext;
 import org.example.Errors.DataBaseException;
 import org.example.Errors.DuplicateDataException;
 import org.example.Errors.NotFoundException;
@@ -28,29 +29,30 @@ class SongsRepositoryImplTest {
 
     @Container
     public static PostgreSQLContainer<?> container = new PostgreSQLContainer<>(DockerImageName.parse("postgres:17.2"))
-            .withDatabaseName("Music")
+            .withDatabaseName("music")
             .withUsername("postgres")
-            .withPassword("111")
-            .withExposedPorts(5432)
-            .withInitScript("db_migration.sql");
+            .withPassword("111");
 
     @BeforeAll
-    public static void setUp() {
-
+    public static void setUp() throws SQLException {
+        String db = "jdbc:postgresql://localhost:5432/" + container.getDatabaseName();
+        String user = container.getUsername();
+        String password = container.getPassword();
         container.start();
+        DataBaseContext.init(DriverManager.getConnection(db, user, password));
     }
 
     @Test
     void save() {
 
-        Singers singer = new Singers(2, "Windmill");
-        Songs song = new Songs(5, "Rapunzel", singer);
+        Singers singer = new SingersRepositoryImpl().findById(2);
+        Songs song = new Songs(12, "Rapunzel", singer);
 
         new SongsRepositoryImpl().save(song);
-        Songs savedSong = new SongsRepositoryImpl().findById(5);
+        Songs savedSong = new SongsRepositoryImpl().findById(12);
 
         assertEquals(savedSong.toString(), song.toString());
-        Songs songsError = new Songs(5, "Rapunzel", singer);
+        Songs songsError = new Songs(12, "Rapunzel", singer);
         assertThrows(DuplicateDataException.class, () -> {
             new SongsRepositoryImpl().save(songsError);
         });
@@ -58,24 +60,24 @@ class SongsRepositoryImplTest {
 
     @Test
     void findById() {
-        int id = 3;
-        String songName = "Star of name Sun";
-        Singers singer = new Singers(3, "Cinema");
+        int id = 1;
+        String songName = "Confession of a Vampire";
+        Singers singer = new Singers(1, "KingAndJocker");
         Songs song = new Songs(id, songName, singer);
 
-        String resultSong = new SongsRepositoryImpl().findById(3).toString();
+        String resultSong = new SongsRepositoryImpl().findById(1).toString();
 
         assertEquals(resultSong, song.toString());
 
         try {
-            new SongsRepositoryImpl().findById(9);
+            new SongsRepositoryImpl().findById(29);
         } catch (NotFoundException e) {
             assertEquals("Песни с таким индексон не найдено", e.getMessage());
         }
     }
 
     @Test
-    void findAll() throws SQLException{
+    void findAll() throws SQLException {
 
         List<Songs> songs = new SongsRepositoryImpl().findAll();
         List<String> findSongs = new ArrayList<>();
@@ -104,7 +106,7 @@ class SongsRepositoryImplTest {
     @Test
     void deleteById() {
 
-        assertTrue(new SongsRepositoryImpl().deleteById(5));
+        assertTrue(new SongsRepositoryImpl().deleteById(6));
 
         try {
             new SongsRepositoryImpl().deleteById(-8);
@@ -117,28 +119,27 @@ class SongsRepositoryImplTest {
     void update() {
 
         Singers singer = new Singers(1, "KingAndJocker");
-        Singers newSinger = new Singers(2, "Windmill");
+        Singers newSinger = new Singers(4, "Stray Kids");
 
         SingersRepositoryImpl singersRepository = new SingersRepositoryImpl();
-
         SongsRepositoryImpl songsRepository = new SongsRepositoryImpl();
 
-        Songs song = new Songs(2, "Good pirate", singersRepository.findById(1));
+        Songs song = new Songs(5, "Go Life", singersRepository.findById(4));
         songsRepository.update(song);
 
-        Songs updateSong = songsRepository.findById(2);
+        Songs updateSong = songsRepository.findById(5);
         assertEquals(updateSong.toString(), song.toString());
 
-        song.setNameSong("Wild grasses");
+        song.setNameSong("AllIn");
 
         song.setSinger(newSinger);
 
         songsRepository.update(song);
-        updateSong = songsRepository.findById(2);
+        updateSong = songsRepository.findById(5);
         assertEquals(updateSong.toString(), song.toString());
 
         try {
-            new SongsRepositoryImpl().update(new Songs(8, "HAE", singer));
+            new SongsRepositoryImpl().update(new Songs(28, "HAE", singer));
         } catch (DataBaseException e) {
             assertEquals("Ошибка обновления", e.getMessage());
         }

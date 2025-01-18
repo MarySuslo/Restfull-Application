@@ -1,5 +1,8 @@
 package org.example.db;
 
+
+import org.example.Errors.DataBaseException;
+
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -7,6 +10,7 @@ import java.sql.SQLException;
 import java.util.Properties;
 
 public class ConnectionManagerImpl implements ConnectionManager {
+
     final String[] PROPERTY_DATE = new String[3];
 
     public String[] getPropertyData() {

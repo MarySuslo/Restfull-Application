@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.example.DataBaseContext;
 import org.example.model.Singers;
 import org.example.repository.SingersRepositoryImpl;
 import org.example.service.impl.SingersServiceImpl;
@@ -23,6 +24,8 @@ import org.mockito.quality.Strictness;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -46,6 +49,14 @@ public class SingersServletTest {
 
     private Gson gson;
 
+    @BeforeAll
+    public static void startUpData() throws SQLException {
+        String db = "jdbc:postgresql://localhost:5432/" + "music";
+        String user = "postgres";
+        String password = "111";
+        DataBaseContext.init(DriverManager.getConnection(db, user, password));
+    }
+
     @BeforeEach
     public void setUp() {
         gson = new Gson();
@@ -56,10 +67,10 @@ public class SingersServletTest {
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
 
-        when(request.getParameter("id")).thenReturn("1");
+        when(request.getParameter("id")).thenReturn("4");
 
-        int id = 1;
-        String nameSinger = "KingAndJocker";
+        int id = 4;
+        String nameSinger = "Stray Kids";
         Singers singer = new Singers(id, nameSinger);
         SingersDto singerDto = new SingersDto(id, nameSinger);
 
@@ -83,10 +94,10 @@ public class SingersServletTest {
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
 
-        when(request.getParameter("idSinger")).thenReturn("6");
+        when(request.getParameter("idSinger")).thenReturn("12");
         when(request.getParameter("name")).thenReturn("Ateez");
 
-        int id = 6;
+        int id = 12;
         String nameSinger = "Ateez";
         Singers singer = new Singers(id, nameSinger);
         SingersDto singerDto = new SingersDto(id, nameSinger);
@@ -112,11 +123,11 @@ public class SingersServletTest {
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
 
-        when(request.getParameter("idSinger")).thenReturn("3");
-        when(request.getParameter("name")).thenReturn("Cinema");
+        when(request.getParameter("idSinger")).thenReturn("10");
+        when(request.getParameter("name")).thenReturn("Greenish day");
 
-        int id = 3;
-        String nameSinger = "Cinema";
+        int id = 10;
+        String nameSinger = "Greenish day";
         Singers singer = new Singers(id, nameSinger);
         SingersDto singerDto = new SingersDto(id, nameSinger);
 
@@ -141,7 +152,7 @@ public class SingersServletTest {
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
 
-        when(request.getParameter("id")).thenReturn("6");
+        when(request.getParameter("id")).thenReturn("11");
 
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
@@ -161,11 +172,16 @@ public class SingersServletTest {
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
 
-        Singers singer1 = new Singers(1, "KingAndJocker");
-        Singers singer2 = new Singers(2, "Windmill");
-        Singers singer3 = new Singers(3, "Cinema");
-
-        List<Singers> singers = Arrays.asList(singer1, singer2, singer3);
+        List<Singers> singers = Arrays.asList(new Singers(1, "KingAndJocker"),
+                new Singers(2, "Windmill"),
+                new Singers(3, "Movie"),
+                new Singers(4, "Stray Kids"),
+                new Singers(5, "Skilet"),
+                new Singers(6, "Three Days Grace"),
+                new Singers(7, "Imagine Dragons"),
+                new Singers(10, "Greenish day"),
+                new Singers(12, "Ateez")
+        );
 
         when(singersRepository.findAll()).thenReturn(singers);
 

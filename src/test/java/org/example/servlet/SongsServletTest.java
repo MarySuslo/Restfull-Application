@@ -4,16 +4,14 @@ import com.google.gson.Gson;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.example.DataBaseContext;
 import org.example.model.Singers;
 import org.example.model.Songs;
 import org.example.repository.SingersRepositoryImpl;
 import org.example.repository.SongsRepositoryImpl;
-import org.example.service.impl.SingersServiceImpl;
 import org.example.service.impl.SongsServiceImpl;
-import org.example.servlet.dto.SingersDto;
 import org.example.servlet.dto.SongsDto;
 import org.example.servlet.mapper.SimpleDtomapper;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,6 +25,8 @@ import org.mockito.quality.Strictness;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -53,6 +53,14 @@ class SongsServletTest {
 
     private Gson gson;
 
+    @BeforeAll
+    public static void startUpData() throws SQLException {
+        String db = "jdbc:postgresql://localhost:5432/" + "music";
+        String user = "postgres";
+        String password = "111";
+        DataBaseContext.init(DriverManager.getConnection(db, user, password));
+    }
+
     @BeforeEach
     public void setUp() {
         gson = new Gson();
@@ -63,11 +71,11 @@ class SongsServletTest {
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
 
-        when(request.getParameter("id")).thenReturn("1");
+        when(request.getParameter("id")).thenReturn("11");
 
-        int id = 1;
-        String nameSong = "Confession of a Vampire";
-        Singers singer = new Singers(1, "King of jockers");
+        int id = 11;
+        String nameSong = "Thunderous";
+        Singers singer = new Singers(4, "Stray Kids");
         Songs song = new Songs(id, nameSong, singer);
         SongsDto songDto = new SongsDto(id, nameSong, singer);
 
@@ -91,14 +99,14 @@ class SongsServletTest {
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
 
-        when(request.getParameter("idSong")).thenReturn("4");
+        when(request.getParameter("idSong")).thenReturn("15");
         when(request.getParameter("name")).thenReturn("Dugon");
         when(request.getParameter("idSinger")).thenReturn("1");
 
-        int id = 4;
+        int id = 15;
         String nameSong = "Dugon";
         int singerId = 1;
-        String nameSinger = "King of jockers";
+        String nameSinger = "KingAndJocker";
         Singers singer = new Singers(singerId, nameSinger);
         Songs song = new Songs(id, nameSong, singer);
         SongsDto songDto = new SongsDto(id, nameSong, singer);
@@ -125,14 +133,14 @@ class SongsServletTest {
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
 
-        when(request.getParameter("idSong")).thenReturn("2");
-        when(request.getParameter("name")).thenReturn("Way of dream");
-        when(request.getParameter("idSinger")).thenReturn("2");
+        when(request.getParameter("idSong")).thenReturn("16");
+        when(request.getParameter("name")).thenReturn("The Upside");
+        when(request.getParameter("idSinger")).thenReturn("11");
 
-        int id = 2;
-        String nameSong = "Way of dream";
-        int singerId = 2;
-        String nameSinger = "Windmill";
+        int id = 16;
+        String nameSong = "The Upside";
+        int singerId = 11;
+        String nameSinger = "Lindsy Stirlink";
         Singers singer = new Singers(singerId, nameSinger);
         Songs song = new Songs(id, nameSong, singer);
         SongsDto songDto = new SongsDto(id, nameSong, singer);
@@ -155,11 +163,11 @@ class SongsServletTest {
     }
 
     @Test
-    void doDelete()throws ServletException, IOException{
+    void doDelete() throws ServletException, IOException {
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
 
-        when(request.getParameter("id")).thenReturn("3");
+        when(request.getParameter("id")).thenReturn("9");
 
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
@@ -178,13 +186,22 @@ class SongsServletTest {
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
 
-        Songs song1 = new Songs(1, "Confession of a Vampire", new Singers(1, "King of jockers"));
+        List<Songs> songs = Arrays.asList(
+                new Songs(1, "Confession of a Vampire", new Singers(1, "KingAndJocker")),
 
-        Songs song2 = new Songs(2, "Way of dream", new Singers(2, "Windmill"));
-
-        Songs song3 = new Songs(4, "Dugon",new Singers(1, "King of jockers") );
-
-        List<Songs> songs = Arrays.asList( song1,song2, song3);
+                new Songs(2, "Way of dream", new Singers(2, "Windmill")),
+                new Songs(3, "Star of name Sun", new Singers(3, "Movie")),
+                new Songs(4, "Rom", new Singers(1, "KingAndJocker")),
+                new Songs(5, "Wild herbs", new Singers(2, "Windmill")),
+                new Songs(6, "Miroh", new Singers(4, "Stray Kids")),
+                new Songs(7, "Unpopular", new Singers(5, "Skilet")),
+                new Songs(8, "Home", new Singers(6, "Three Days Grace")),
+                new Songs(10, "Believer", new Singers(7, "Imagine Dragons")),
+                new Songs(11, "Thunderous", new Singers(4, "Stray Kids")),
+                new Songs(13, "American Idiot", new Singers(10, "Green Day")),
+                new Songs(15, "Dugon", new Singers(1, "KingAndJocker")),
+                new Songs(16, "The Upside", new Singers(11, "Lindsy Stirlink"))
+        );
 
         when(songsRepository.findAll()).thenReturn(songs);
 

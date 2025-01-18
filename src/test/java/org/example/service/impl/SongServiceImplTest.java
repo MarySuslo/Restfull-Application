@@ -30,8 +30,8 @@ class SongServiceImplTest {
     @Test
     void findById() {
 
-        int id = 2;
-        String nameSong = "Withards doll";
+        int id = 4;
+        String nameSong = "Rom";
 
         Singers singer = new Singers(1, "KingAndJocker");
 
@@ -53,8 +53,8 @@ class SongServiceImplTest {
     @Test
     void save() {
 
-        int songId = 1;
-        String songName = "Confession of a Vampire";
+        int songId = 14;
+        String songName = "Shadow of clown";
         Singers singer = new Singers(1, "KingAndJocker");
         Songs song = new Songs(songId, songName, singer);
 
@@ -75,13 +75,13 @@ class SongServiceImplTest {
     @Test
     void deleteById() {
 
-        int id = 3;
+        int id = 14;
 
         when(songsRepository.deleteById(id)).thenReturn(true);
 
         assertTrue(songService.delete(id));
 
-        assertFalse(songService.delete(10));
+        assertFalse(songService.delete(30));
 
     }
 
