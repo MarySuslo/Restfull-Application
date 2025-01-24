@@ -4,13 +4,11 @@ import com.google.gson.Gson;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.example.DataBaseContext;
 import org.example.model.Singers;
 import org.example.repository.SingersRepositoryImpl;
 import org.example.service.impl.SingersServiceImpl;
 import org.example.servlet.dto.SingersDto;
 import org.example.servlet.mapper.SimpleDtomapper;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -54,7 +52,7 @@ public class SingersServletTest {
         String db = "jdbc:postgresql://localhost:5432/" + "music";
         String user = "postgres";
         String password = "111";
-        DataBaseContext.init(DriverManager.getConnection(db, user, password));
+      new  DataBaseContext().init(DriverManager.getConnection(db, user, password));
     }
 
     @BeforeEach
@@ -180,7 +178,8 @@ public class SingersServletTest {
                 new Singers(6, "Three Days Grace"),
                 new Singers(7, "Imagine Dragons"),
                 new Singers(10, "Greenish day"),
-                new Singers(12, "Ateez")
+                new Singers(12, "Ateez"),
+                        new Singers(13, "Scorpions")
         );
 
         when(singersRepository.findAll()).thenReturn(singers);

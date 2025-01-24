@@ -30,7 +30,7 @@ public class ConnectionManagerImpl implements ConnectionManager {
     }
 
     @Override
-    public Connection getConnection() throws SQLException {
+    public Connection getConnection()  {
 
         Connection connection = null;
 
@@ -40,9 +40,13 @@ public class ConnectionManagerImpl implements ConnectionManager {
         String username = propertyData[1];
         String password = propertyData[2];
 
-        DriverManager.registerDriver(new org.postgresql.Driver());
+        try {
+            DriverManager.registerDriver(new org.postgresql.Driver());
 
         connection = DriverManager.getConnection(urlDB, username, password);
+    } catch (SQLException e) {
+        throw new DataBaseException("Connection null");
+    }
 
         return connection;
     }

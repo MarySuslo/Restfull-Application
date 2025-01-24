@@ -30,6 +30,7 @@ INSERT INTO public.singers (id_singer, name_singer) VALUES (6, 'Three Days Grace
 INSERT INTO public.singers (id_singer, name_singer) VALUES (7, 'Imagine Dragons');
 INSERT INTO public.singers (id_singer, name_singer) VALUES (10, 'Green Day');
 INSERT INTO public.singers (id_singer, name_singer) VALUES (11, 'Lindsy Stirlink');
+INSERT INTO public.singers (id_singer, name_singer) VALUES (13, 'Scorpions');
 
 INSERT INTO public.songs (id_song, name_song, singer) VALUES (1, 'Confession of a Vampire', 1);
 INSERT INTO public.songs (id_song, name_song, singer) VALUES (2, 'Way of dream', 2);
@@ -44,3 +45,4 @@ INSERT INTO public.songs (id_song, name_song, singer) VALUES (10, 'Believer', 7)
 INSERT INTO public.songs (id_song, name_song, singer) VALUES (11, 'Thunderous', 4);
 INSERT INTO public.songs (id_song, name_song, singer) VALUES (13, 'American Idiot', 10);
 INSERT INTO public.songs (id_song, name_song, singer) VALUES (16, 'Inner gold', 11);
+INSERT INTO public.songs (id_song, name_song, singer) VALUES (17, 'May be', 13);

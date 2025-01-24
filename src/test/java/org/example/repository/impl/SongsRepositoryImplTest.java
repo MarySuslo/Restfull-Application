@@ -1,6 +1,5 @@
 package org.example.repository.impl;
 
-import org.example.DataBaseContext;
 import org.example.Errors.DataBaseException;
 import org.example.Errors.DuplicateDataException;
 import org.example.Errors.NotFoundException;
@@ -34,12 +33,8 @@ class SongsRepositoryImplTest {
             .withPassword("111");
 
     @BeforeAll
-    public static void setUp() throws SQLException {
-        String db = "jdbc:postgresql://localhost:5432/" + container.getDatabaseName();
-        String user = container.getUsername();
-        String password = container.getPassword();
+    public static void setUp(){
         container.start();
-        DataBaseContext.init(DriverManager.getConnection(db, user, password));
     }
 
     @Test

@@ -11,12 +11,10 @@ import org.example.model.Songs;
 import org.example.repository.SingersRepositoryImpl;
 import org.example.repository.SongsRepositoryImpl;
 import org.example.service.impl.SongsServiceImpl;
-import org.example.servlet.dto.SingersDto;
 import org.example.servlet.dto.SongsDto;
 import org.example.servlet.mapper.SongsDtomapperImpl;
 
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.List;
 
 
@@ -45,6 +43,7 @@ public class SongsServlet extends HttpServlet {
         String parametrId = req.getParameter("id");
         resp.setContentType("application/json");
         if (parametrId == null) {
+
             List<Songs> songs = songsRepository.findAll();
             resp.getWriter().write(gson.toJson(songs));
         } else {

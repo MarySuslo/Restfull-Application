@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.example.DataBaseContext;
 import org.example.model.Singers;
 import org.example.model.Songs;
 import org.example.repository.SingersRepositoryImpl;
@@ -58,7 +57,7 @@ class SongsServletTest {
         String db = "jdbc:postgresql://localhost:5432/" + "music";
         String user = "postgres";
         String password = "111";
-        DataBaseContext.init(DriverManager.getConnection(db, user, password));
+       new DataBaseContext().init(DriverManager.getConnection(db, user, password));
     }
 
     @BeforeEach
@@ -133,14 +132,14 @@ class SongsServletTest {
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
 
-        when(request.getParameter("idSong")).thenReturn("16");
-        when(request.getParameter("name")).thenReturn("The Upside");
-        when(request.getParameter("idSinger")).thenReturn("11");
+        when(request.getParameter("idSong")).thenReturn("17");
+        when(request.getParameter("name")).thenReturn("Wind Of Change");
+        when(request.getParameter("idSinger")).thenReturn("13");
 
-        int id = 16;
-        String nameSong = "The Upside";
-        int singerId = 11;
-        String nameSinger = "Lindsy Stirlink";
+        int id = 17;
+        String nameSong = "Wind Of Change";
+        int singerId = 13;
+        String nameSinger = "Scorpions";
         Singers singer = new Singers(singerId, nameSinger);
         Songs song = new Songs(id, nameSong, singer);
         SongsDto songDto = new SongsDto(id, nameSong, singer);
@@ -188,19 +187,20 @@ class SongsServletTest {
 
         List<Songs> songs = Arrays.asList(
                 new Songs(1, "Confession of a Vampire", new Singers(1, "KingAndJocker")),
-
-                new Songs(2, "Way of dream", new Singers(2, "Windmill")),
-                new Songs(3, "Star of name Sun", new Singers(3, "Movie")),
+                new Songs(2, "Way of dream", new Singers(2, "Water mill")),
+                new Songs(3, "Star of name Sun", new Singers(3, "Cinema")),
                 new Songs(4, "Rom", new Singers(1, "KingAndJocker")),
-                new Songs(5, "Wild herbs", new Singers(2, "Windmill")),
-                new Songs(6, "Miroh", new Singers(4, "Stray Kids")),
-                new Songs(7, "Unpopular", new Singers(5, "Skilet")),
+                new Songs(5, "AllIn", new Singers(4, "Stray Kids")),
+                //new Songs(6, "Miroh", new Singers(4, "Stray Kids")), new Songs(7, "Unpopular", new Singers(5, "Skilet")),
                 new Songs(8, "Home", new Singers(6, "Three Days Grace")),
                 new Songs(10, "Believer", new Singers(7, "Imagine Dragons")),
                 new Songs(11, "Thunderous", new Singers(4, "Stray Kids")),
-                new Songs(13, "American Idiot", new Singers(10, "Green Day")),
+               new Songs (12,"Rapunzel",new Singers (2,"Water mill")),
+                new Songs(13, "American Idiot", new Singers(10, "Greenish day")),
                 new Songs(15, "Dugon", new Singers(1, "KingAndJocker")),
-                new Songs(16, "The Upside", new Singers(11, "Lindsy Stirlink"))
+                        new Songs(17, "Wind Of Change", new Singers(13, "Scorpions"))
+
+              //  new Songs(16, "The Upside", new Singers(11, "Lindsy Stirlink"))
         );
 
         when(songsRepository.findAll()).thenReturn(songs);
