@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.example.db.DataBaseContext;
 import org.example.model.Singers;
 import org.example.repository.SingersRepositoryImpl;
 import org.example.service.impl.SingersServiceImpl;
@@ -52,7 +53,7 @@ public class SingersServletTest {
         String db = "jdbc:postgresql://localhost:5432/" + "music";
         String user = "postgres";
         String password = "111";
-      new  DataBaseContext().init(DriverManager.getConnection(db, user, password));
+        new DataBaseContext().init(DriverManager.getConnection(db, user, password));
     }
 
     @BeforeEach

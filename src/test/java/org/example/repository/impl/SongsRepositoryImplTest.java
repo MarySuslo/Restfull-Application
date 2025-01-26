@@ -27,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class SongsRepositoryImplTest {
 
     @Container
-    public static PostgreSQLContainer<?> container = new PostgreSQLContainer<>(DockerImageName.parse("postgres:17.2"))
+    public static PostgreSQLContainer<?> container = new PostgreSQLContainer<>(DockerImageName.parse("postgres:17"))
             .withDatabaseName("music")
             .withUsername("postgres")
             .withPassword("111");

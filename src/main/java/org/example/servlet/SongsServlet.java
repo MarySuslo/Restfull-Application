@@ -6,6 +6,8 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.example.db.ConnectionManagerImpl;
+import org.example.db.DataBaseContext;
 import org.example.model.Singers;
 import org.example.model.Songs;
 import org.example.repository.SingersRepositoryImpl;
@@ -43,7 +45,6 @@ public class SongsServlet extends HttpServlet {
         String parametrId = req.getParameter("id");
         resp.setContentType("application/json");
         if (parametrId == null) {
-
             List<Songs> songs = songsRepository.findAll();
             resp.getWriter().write(gson.toJson(songs));
         } else {
